@@ -1,0 +1,37 @@
+if (NOT BUILD_TESTING)
+    return()
+endif()
+
+include(FetchContent)
+FetchContent_Declare(
+    Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG        v3.8.0
+)
+FetchContent_MakeAvailable(Catch2)
+target_compile_features(Catch2 PRIVATE cxx_std_17)
+target_compile_features(Catch2WithMain PRIVATE cxx_std_17)
+
+list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
+include(Catch)
+
+add_executable(LazyImport_tests test.cpp)
+
+target_link_libraries(LazyImport_tests
+    PRIVATE
+        LazyImport
+        Catch2::Catch2WithMain
+)
+target_compile_features(LazyImport_tests PRIVATE cxx_std_23)
+
+catch_discover_tests(LazyImport_tests)
+
+
+
+
+
+# 性能测试
+# add_executable(pattern_scanner_bench bench.cpp catch_amalgamated.cpp)
+# target_link_libraries(pattern_scanner_bench PRIVATE pattern_scanner)
+# add_test(NAME PatternScanner.Benchmarks COMMAND pattern_scanner_bench)
+# set_tests_properties(PatternScanner.Benchmarks PROPERTIES LABELS "Bench")
