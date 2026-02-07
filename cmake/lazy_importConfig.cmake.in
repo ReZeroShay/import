@@ -1,0 +1,6 @@
+# cmake/lazy_importConfig.cmake.in
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/lazy_importTargets.cmake")
+
+check_required_components(lazy_import)
