@@ -2,9 +2,10 @@
 #include <catch2/matchers/catch_matchers_all.hpp>
 #include <windows.h>
 #include <cstdint>
-#include "lazy_import.hpp"
+#include <witch_cult/lazy_import.h>
 
 TEST_CASE("Utility Functions - Hashing", "[utils]") {
+    using namespace witch_cult;
     SECTION("FNV1a Hash Consistency") {
         auto hash1 = Fnv1aHash("GetProcAddress", 14);
         auto hash2 = Fnv1aHash("GetProcAddress", 14);
@@ -28,6 +29,7 @@ TEST_CASE("Utility Functions - Hashing", "[utils]") {
 }
 
 TEST_CASE("Module Resolution", "[module]") {
+    using namespace witch_cult;
     SECTION("Find Known Modules") {
         // 获取系统真实句柄用于对比
         HMODULE real_k32 = GetModuleHandleW(L"kernel32.dll");
@@ -50,6 +52,7 @@ TEST_CASE("Module Resolution", "[module]") {
 }
 
 TEST_CASE("Export Resolution", "[export]") {
+    using namespace witch_cult;
     HMODULE k32 = GetModuleHandleW(L"kernel32.dll");
 
     SECTION("Find Known Exports") {
@@ -67,6 +70,7 @@ TEST_CASE("Export Resolution", "[export]") {
 }
 
 TEST_CASE("Lazy Import Interface & Caching", "[lazy]") {
+    using namespace witch_cult;
     SECTION("Module Caching") {
         auto instance = LazyImportMod(kernel32.dll);
 
@@ -101,6 +105,7 @@ TEST_CASE("Lazy Import Interface & Caching", "[lazy]") {
 }
 
 TEST_CASE("Complex Dependency Thread Safety", "[concurrency]") {
+    using namespace witch_cult;
     SECTION("Multi-threaded resolve") {
         // 虽然 Catch2 不是专门的压力测试工具，但我们可以简单验证
         // 多个线程同时调用同一个 LazyFn 是否会崩溃或产生多个值
@@ -121,6 +126,7 @@ TEST_CASE("Complex Dependency Thread Safety", "[concurrency]") {
 #include <vector>
 
 TEST_CASE("ImportFn cached is thread-stable", "[thread][cache]") {
+    using namespace witch_cult;
     constexpr int N = 8;
     void *results[N]{};
 
@@ -138,6 +144,8 @@ TEST_CASE("ImportFn cached is thread-stable", "[thread][cache]") {
 }
 
 TEST_CASE("Resolve user32!MessageBoxW", "[ImportFn][user32]") {
+    using namespace witch_cult;
+    using namespace witch_cult;
     printf("symbol %p", &MessageBoxW);
     auto lazy_msgbox = LazyFn(user32.dll, MessageBoxW);
 
@@ -151,6 +159,7 @@ TEST_CASE("Resolve user32!MessageBoxW", "[ImportFn][user32]") {
 }
 
 TEST_CASE("LazyFn can call Sleep", "[ImportFn][call]") {
+    using namespace witch_cult;
     auto lazy_sleep = LazyFn(kernel32.dll, Sleep);
 
     auto start = GetTickCount();
@@ -161,6 +170,7 @@ TEST_CASE("LazyFn can call Sleep", "[ImportFn][call]") {
 }
 
 TEST_CASE("ImportFn resolves Sleep correctly", "[ImportFn]") {
+    using namespace witch_cult;
     auto lazy_sleep = LazyFn(kernel32.dll, Sleep);
 
     auto fn = lazy_sleep.cached();
@@ -172,6 +182,7 @@ TEST_CASE("ImportFn resolves Sleep correctly", "[ImportFn]") {
     REQUIRE(fn == real);
 }
 TEST_CASE("ImportModule cached() returns stable value", "[ImportModule][cache]") {
+    using namespace witch_cult;
     auto importer = LazyImportMod(kernel32.dll);
 
     auto first = importer.cached();
@@ -183,6 +194,7 @@ TEST_CASE("ImportModule cached() returns stable value", "[ImportModule][cache]")
     REQUIRE(second == third);
 }
 TEST_CASE("ImportModule resolves kernel32.dll", "[ImportModule]") {
+    using namespace witch_cult;
     auto mod = LazyImportMod(kernel32.dll).resolve();
     REQUIRE(mod != nullptr);
 
