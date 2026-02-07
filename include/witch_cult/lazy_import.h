@@ -536,4 +536,4 @@ namespace witch_cult {
 #define FnHash(x) witch_cult::Fnv1aHash(#x, sizeof(#x) - 1)
 #define LazyImportMod(x) witch_cult::ImportModule<ModHash(x)>()
 #define LazyFn(mod, fn) witch_cult::ImportFn<decltype(fn), ModHash(mod), FnHash(fn)>()
-#define LazyInvoke(mod, fn) witch_cult::ImportFn<decltype(fn), ModHash(mod), FnHash(fn)>()
+#define LazyInvoke(mod, fn) witch_cult::ImportInvoke<ModHash(mod), FnHash(fn)>()
